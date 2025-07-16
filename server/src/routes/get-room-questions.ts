@@ -23,9 +23,13 @@ export const getRoomQuestions: FastifyPluginAsyncZod = async (app) => {
             createdAt: schemas.questions.createdAt
         })
         .from(schemas.questions)
-        .where(eq(schemas.questions.id, roomId))
+        .where(eq(schemas.questions.roomId, roomId))
         .orderBy(desc(schemas.questions.createdAt))
 
-        return result
+        if (result.length == 0) {
+            return reply.status(404).send({ error: "Room not found" })
+        }
+
+        return reply.status(200).send({ questions: result })
     })
 }
