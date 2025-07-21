@@ -6,7 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
-import { useMutation } from "@tanstack/react-query";
+import { useCreateRoom } from "@/http/use-create-room";
 
 
 const createRoomSchema = z.object({
@@ -16,12 +16,12 @@ const createRoomSchema = z.object({
 
 type CreateRoomFormData = z.infer<typeof createRoomSchema>
 
-type CreateRoomResponse = {
-    id: string;
-}
 
 
 function RoomForm() {
+    const { mutateAsync: CreateRoom } = useCreateRoom()
+
+
     const createRoomForm = useForm<CreateRoomFormData>({
         resolver: zodResolver(createRoomSchema),
         defaultValues: {
@@ -30,22 +30,9 @@ function RoomForm() {
         }
     });
 
-    function handleCreateRoom(room: CreateRoomFormData) {
-        return useMutation ({
-            mutationFn: async () => {
-                const response = await fetch("http://localhost:3333/rooms", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(room)
-                })
-
-                const result: CreateRoomResponse = await response.json()
-
-                return result
-            }
-        })
+    async function handleCreateRoom(room: CreateRoomFormData) {
+        await CreateRoom(room)
+        createRoomForm.reset()
     }
 
     return (
