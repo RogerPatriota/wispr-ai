@@ -9,13 +9,14 @@ export const getRooms: FastifyPluginAsyncZod = async (app) => {
         .select({
             id: schemas.rooms.id,
             name: schemas.rooms.name,
-            questionsCount: count(schemas.questions.id)
+            questionsCount: count(schemas.questions.id),
+            createdAt: schemas.rooms.createdAt
         })
         .from(schemas.rooms)
         .leftJoin(schemas.questions, eq(schemas.questions.roomId, schemas.rooms.id))
         .groupBy(schemas.rooms.id, schemas.rooms.name)
         .orderBy(desc(schemas.rooms.createdAt))
 
-        return reply.status(200).send({rooms})
+        return reply.status(200).send(rooms)
     })
 }
