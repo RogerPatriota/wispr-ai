@@ -17,7 +17,6 @@ export function QuestionList(props: QuestionListProps) {
       </div>
 
       {data?.map((question) => {
-        console.log(question)
         return <QuestionItem key={question.id} question={question} />
       })}
     </div>

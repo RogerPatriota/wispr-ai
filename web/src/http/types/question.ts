@@ -9,3 +9,10 @@ export type GetQuestionResponse = {
     questions: Question[];
 }
 
+export type CreateQuestionRequest = {
+    title: string;
+}
+
+export type CreateQuestionResponse = {
+    questionId: string
+}

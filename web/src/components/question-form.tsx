@@ -18,10 +18,10 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
-// import { useCreateQuestion } from '@/http/use-create-question'
+import { useCreateQuestion } from '@/http/use-create-question'
 
 const createQuestionSchema = z.object({
-  question: z
+  title: z
     .string()
     .min(1, 'Pergunta é obrigatória')
     .min(10, 'Pergunta deve ter pelo menos 10 caracteres')
@@ -35,17 +35,17 @@ interface QuestionFormProps {
 }
 
 function QuestionForm({ roomId }: QuestionFormProps) {
-  // const { mutateAsync: createQuestion } = useCreateQuestion(roomId)
+  const { mutateAsync: createQuestion } = useCreateQuestion(roomId)
 
   const form = useForm<CreateQuestionFormData>({
     resolver: zodResolver(createQuestionSchema),
     defaultValues: {
-      question: '',
+      title: '',
     },
   })
 
   async function handleCreateQuestion(data: CreateQuestionFormData) {
-    // await createQuestion(data)
+    await createQuestion(data)
   }
 
   const { isSubmitting } = form.formState
@@ -66,7 +66,7 @@ function QuestionForm({ roomId }: QuestionFormProps) {
           >
             <FormField
               control={form.control}
-              name="question"
+              name="title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Sua Pergunta</FormLabel>
