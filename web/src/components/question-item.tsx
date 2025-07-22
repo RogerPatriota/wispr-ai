@@ -15,7 +15,6 @@ interface QuestionItemProps {
 }
 
 function QuestionItem({ question }: QuestionItemProps) {
-  console.log(question)
   return (
     <Card>
       <CardContent>
