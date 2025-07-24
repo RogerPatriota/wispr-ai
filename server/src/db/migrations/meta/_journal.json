@@ -15,6 +15,13 @@
       "when": 1752628404898,
       "tag": "0001_curious_leopardon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1753378699592,
+      "tag": "0002_tranquil_daredevil",
+      "breakpoints": true
     }
   ]
 }
