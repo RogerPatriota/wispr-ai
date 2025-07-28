@@ -30,6 +30,6 @@ export const getRoomQuestions: FastifyPluginAsyncZod = async (app) => {
             return reply.status(404).send({ error: "Room not found" })
         }
 
-        return reply.status(200).send({ questions: result })
+        return reply.status(200).send(result)
     })
 }

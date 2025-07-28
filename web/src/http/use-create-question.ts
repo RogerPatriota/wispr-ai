@@ -1,5 +1,5 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import type { CreateQuestionRequest, CreateQuestionResponse } from "./types/question";
+import type { CreateQuestionRequest, CreateQuestionResponse, GetQuestionResponse } from "./types/question";
 
 export function useCreateQuestion(roomId: string) {
     const queryClient = useQueryClient()
@@ -19,8 +19,54 @@ export function useCreateQuestion(roomId: string) {
             return result
         },
 
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['get-questions', roomId]})
+        onMutate({ title }) {
+            const previousQuestions = queryClient.getQueryData<GetQuestionResponse>([
+                'get-questions', 
+                roomId
+            ])
+
+            const questions = previousQuestions ?? []
+
+            const newQuestion = {
+                id: crypto.randomUUID(),
+                title,
+                answer: null,
+                createdAt: new Date().toISOString()
+            }
+
+            const updatedData: GetQuestionResponse = [
+                newQuestion, ...questions
+            ]
+
+            queryClient.setQueryData<GetQuestionResponse>(['get-questions', roomId], updatedData)
+
+            return { newQuestion, previousQuestions}
+        },
+
+        onSuccess(data, _variables, context) {
+            queryClient.setQueryData<GetQuestionResponse>(['get-questions', roomId], 
+                questions => {
+                    if (!questions || !context.newQuestion)  {
+                        return questions
+                    }
+                    return questions.map(question => {
+                        if (question.id === context.newQuestion.id) {
+                            return {...context.newQuestion, id: data.questionId, answer: data.answer}
+                        }
+
+                        return question
+                    })
+                }
+            )
+        },
+
+        onError(_error, _newQuestion, context) {
+            if (context?.previousQuestions) {
+                queryClient.setQueryData<GetQuestionResponse>(['get-questions', roomId], context.previousQuestions)
+            }
         }
+        // onSuccess: () => {
+        //     queryClient.invalidateQueries({ queryKey: ['get-questions', roomId]})
+        // }
     })
 }

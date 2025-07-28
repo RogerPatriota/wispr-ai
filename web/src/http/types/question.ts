@@ -1,13 +1,11 @@
-export type Question = {
+
+
+export type GetQuestionResponse = Array<{
     id: string;
     title: string;
-    answer: string;
+    answer: string | null;
     createdAt: string;  
-}
-
-export type GetQuestionResponse = {
-    questions: Question[];
-}
+}>
 
 export type CreateQuestionRequest = {
     title: string;
@@ -15,4 +13,5 @@ export type CreateQuestionRequest = {
 
 export type CreateQuestionResponse = {
     questionId: string
+    answer: string | null
 }

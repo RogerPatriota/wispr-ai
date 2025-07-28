@@ -8,8 +8,8 @@ function useQuestion(roomId: string) {
             const response = await fetch(`http://localhost:3333/room/${roomId}/questions`,)
 
             const result: GetQuestionResponse =  await response.json()
-
-            return result.questions
+            console.log(result)
+            return result
         }
     })
     

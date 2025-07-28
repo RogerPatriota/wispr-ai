@@ -7,6 +7,7 @@ interface QuestionListProps {
 
 export function QuestionList(props: QuestionListProps) {
   const { data } = useQuestion(props.roomId)
+  console.log(data)
 
   return (
     <div className="space-y-6">
