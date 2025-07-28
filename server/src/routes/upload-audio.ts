@@ -1,6 +1,8 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod"
 import { z } from "zod/v4"
-import { transcribieAudio } from "../services/gemini.ts"
+import { generateEmbeddings, transcribieAudio } from "../services/gemini.ts"
+import { db } from "../db/connection.ts"
+import { schemas } from "../db/schema/index.ts"
 
 export const uploadAudio: FastifyPluginAsyncZod = async (app) => {
     app.post('/rooms/:roomId/audio', {
@@ -21,8 +23,22 @@ export const uploadAudio: FastifyPluginAsyncZod = async (app) => {
         const audioBase64 = audioBuffer.toString('base64')
 
 
-        const trancription = await transcribieAudio(audioBase64, audio.mimetype)
+        const transcription = await transcribieAudio(audioBase64, audio.mimetype)
+        const embeddings = await generateEmbeddings(transcription)
 
-        return trancription
+        const result = await db.insert(schemas.audioChunck).values({
+            roomId,
+            transcription,
+            embeddings
+        }).returning()
+
+        const chunk = result[0]
+
+        if (!chunk) {
+            throw new Error('Failed to create chunk')
+        }
+
+        return reply.status(201).send({ chunkId: chunk.id})
+    
     })
 }
