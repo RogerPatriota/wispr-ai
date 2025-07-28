@@ -46,7 +46,12 @@ function QuestionForm({ roomId }: QuestionFormProps) {
 
 
   async function handleCreateQuestion(data: CreateQuestionFormData) {
-    await createQuestion(data)
+    try {
+      await createQuestion(data)
+      form.reset()
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const { isSubmitting } = form.formState

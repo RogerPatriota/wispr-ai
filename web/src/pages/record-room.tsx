@@ -14,8 +14,8 @@ type RoomParams = {
 function RecordRoom() {
     const [isRecording, setIsRecording] = useState(false)
     const recorder = useRef<MediaRecorder | null>(null)
-
     const params = useParams<RoomParams>()
+    const intervalRef = useRef<NodeJS.Timeout>(null)
 
     if (!params.roomId) {
         return <Navigate replace to="/" />
@@ -36,11 +36,37 @@ function RecordRoom() {
         return result
     }
 
+    function createRecorder(audio:MediaStream) {
+        recorder.current = new MediaRecorder(audio, {
+            mimeType: "audio/webm",
+            audioBitsPerSecond: 64_000
+        })
+
+        recorder.current.ondataavailable = event => {
+            if (event.data.size > 0) {
+                uploadAudio(event.data)
+            }
+        }
+
+        recorder.current.onstart = () => {
+            console.log('gravação iniciada')
+        }
+        recorder.current.onstop = () => {
+            console.log('gravação finalizada')
+        }
+
+        recorder.current.start()        
+    }
+
     function stopRecording() {
         setIsRecording(false)
 
         if (recorder.current && recorder.current.state !== 'inactive') {
             recorder.current.stop()
+        }
+
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current)
         }
     }
 
@@ -52,7 +78,7 @@ function RecordRoom() {
         setIsRecording(true)
 
         try {
-            const audio   = await navigator.mediaDevices.getUserMedia({
+            const audio = await navigator.mediaDevices.getUserMedia({
                 audio: {
                     echoCancellation: true,
                     noiseSuppression: true,
@@ -60,25 +86,12 @@ function RecordRoom() {
                 }
             })
 
-            recorder.current = new MediaRecorder(audio, {
-                mimeType: "audio/webm",
-                audioBitsPerSecond: 64_000
-            })
+            createRecorder(audio)
 
-            recorder.current.ondataavailable = event => {
-                if (event.data.size > 0) {
-                    uploadAudio(event.data)
-                }
-            }
-
-            recorder.current.onstart = () => {
-                console.log('gravação iniciada')
-            }
-            recorder.current.onstop = () => {
-                console.log('gravação finalizada')
-            }
-
-            recorder.current.start()
+            intervalRef.current = setInterval(() => {
+                recorder.current?.stop()
+                createRecorder(audio)
+            }, 5000)
 
         } catch (err) {
             console.log(err)
