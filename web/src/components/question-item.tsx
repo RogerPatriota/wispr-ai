@@ -32,7 +32,6 @@ function QuestionItem({ question }: QuestionItemProps) {
               </p>
             </div>
           </div>
-
           {(!!question.answer || question.isGeneratingAnswer) && (
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0">

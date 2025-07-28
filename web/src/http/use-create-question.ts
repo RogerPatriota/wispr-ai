@@ -31,7 +31,8 @@ export function useCreateQuestion(roomId: string) {
                 id: crypto.randomUUID(),
                 title,
                 answer: null,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                isGeneratingAnswer: true
             }
 
             const updatedData: GetQuestionResponse = [
@@ -51,7 +52,12 @@ export function useCreateQuestion(roomId: string) {
                     }
                     return questions.map(question => {
                         if (question.id === context.newQuestion.id) {
-                            return {...context.newQuestion, id: data.questionId, answer: data.answer}
+                            return {
+                                ...context.newQuestion, 
+                                id: data.questionId, 
+                                answer: data.answer,
+                                isGeneratingAnswer: false
+                            }
                         }
 
                         return question

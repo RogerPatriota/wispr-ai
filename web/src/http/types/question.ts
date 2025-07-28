@@ -4,7 +4,8 @@ export type GetQuestionResponse = Array<{
     id: string;
     title: string;
     answer: string | null;
-    createdAt: string;  
+    createdAt: string;
+    isGeneratingAnswer?: boolean
 }>
 
 export type CreateQuestionRequest = {
